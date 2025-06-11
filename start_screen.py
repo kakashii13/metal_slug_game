@@ -12,10 +12,10 @@ class StartScreen:
         self.title = self.font.render("Shooter Game", True, (0, 0, 0))
         self.title_rect = self.title.get_rect(center=(400, 200))
 
+
     def draw(self):
          while True:
             self.screen.fill(self.bg_color)
-
             title = self.font.render("¡Bienvenido al juego!", True, self.title_color)
             instruction = self.small_font.render("Presioná E para comenzar", True, self.text_color)
 

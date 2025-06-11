@@ -8,7 +8,8 @@ class Bullet:
         self.speed = 15
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.x, self.y, 10, 10))
-
+        bullet_sprite = pygame.image.load("Sprites/Bullet/bullet.png").convert_alpha()
+        screen.blit(bullet_sprite, (self.x, self.y))
+       
     def move(self):
         self.x += self.speed * self.direction

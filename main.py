@@ -50,8 +50,9 @@ def start_game(screen, clock):
         # draw bullet
         if keys[pygame.K_SPACE] and current_time - last_bullet_time > shoot_delay: 
             last_bullet_time = current_time # actualizo el tiempo de disparo
-            bullet = Bullet(character.position[0] + 120, character.position[1], 1)
+            bullet = Bullet(character.get_shoot_position()[0], character.get_shoot_position()[1], 1)
             character_bullets.append(bullet)
+            character.is_shooting = True
         
         for bullet in character_bullets:
             bullet.move()
