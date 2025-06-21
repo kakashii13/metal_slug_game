@@ -22,7 +22,8 @@ FLYING_KILLER_SPAWN_INTERVAL = 6000
 FLYING_KILLER_INITIAL_DELAY = 1000
 OBSTACLE_SPAWN_INTERVAL = 10000
 RESCUED_CHARACTER_SPAWN_INTERVAL = 5000
-SHOOT_DELAY = 200
+SHOOT_DELAY = 600
+SCORE_INCREMENT = 50
 
 
 def main(): 
@@ -30,7 +31,7 @@ def main():
 
     # pantalla del juego
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption("Pygame Window") # titulo de la ventana
+    pygame.display.set_caption("Metal Slug casero") # titulo de la ventana
 
     # reloj
     clock = pygame.time.Clock()
@@ -69,7 +70,6 @@ def exist_superposition(x, objects, margin = 200):
 
 
 def handle_events():
-    """Process Pygame events and exit on quit."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -78,7 +78,6 @@ def handle_events():
 
 def spawn_enemies(current_time, floor, scroll_x, soldier_speed, soldiers,
                   flying_killers, obstacles, rescued_characters, spawn_timers):
-    """Spawn enemies and obstacles based on spawn timers."""
     if current_time - spawn_timers['soldier'] > CHINESE_SOLDIER_SPAWN_INTERVAL:
         spawn_timers['soldier'] = current_time
         soldier = Soldier(WINDOW_WIDTH - 100, floor)
@@ -104,7 +103,6 @@ def spawn_enemies(current_time, floor, scroll_x, soldier_speed, soldiers,
 
 def update_bullets(character, keys, current_time, character_bullets,
                    flying_killers, flying_killer_bullets, last_bullet_time, screen):
-    """Handle character shooting and move all bullets."""
     if keys[pygame.K_SPACE] and current_time - last_bullet_time > SHOOT_DELAY:
         last_bullet_time = current_time
         bullet = Bullet(character.get_shoot_position[0],
@@ -132,7 +130,6 @@ def update_bullets(character, keys, current_time, character_bullets,
 
 def draw_entities(screen, soldiers, flying_killers, obstacles,
                   rescued_characters, scroll_x):
-    """Move and draw all non-player entities."""
     for soldier in soldiers:
         soldier.move()
         soldier.draw(screen)
@@ -151,7 +148,6 @@ def draw_entities(screen, soldiers, flying_killers, obstacles,
 def check_collisions(character, character_bullets, soldiers, flying_killers,
                      flying_killer_bullets, obstacles, rescued_characters,
                      hud, scroll_x, max_lives):
-    """Check and process collisions between all entities."""
     character_rect = pygame.Rect(
         character.position[0],
         character.position[1] - character.hit_box_height,
@@ -159,14 +155,17 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
         character.size[1],
     )
 
+    # Adjuta la posicion del personaje rescatado para que coincida con el personaje principal
+    adjusted_position = 15
+
     for rescued_character in rescued_characters[:]:
-        rc_rect = pygame.Rect(
+        rescued_chacter_rect = pygame.Rect(
             rescued_character.position[0] - scroll_x,
-            rescued_character.position[1] - rescued_character.size[1] + 15,
+            rescued_character.position[1] - rescued_character.size[1] + adjusted_position,
             rescued_character.size[0],
             rescued_character.size[1],
         )
-        if character_rect.colliderect(rc_rect):
+        if character_rect.colliderect(rescued_chacter_rect):
             rescued_character.is_saved = True
             hud.rescue_character()
             rescued_character.remove()
@@ -194,7 +193,7 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
                     soldier.size[1],
                 )
                 if bullet_rect.colliderect(soldier_rect):
-                    hud.add_score(50)
+                    hud.add_score(SCORE_INCREMENT)
                     soldier.remove()
                     character_bullets.remove(bullet)
                     break
@@ -223,13 +222,13 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
 
     for flying_killer in flying_killers[:]:
         if flying_killer.is_alive:
-            fk_rect = pygame.Rect(
+            flying_killer_rect = pygame.Rect(
                 flying_killer.position[0],
                 flying_killer.position[1] - flying_killer.height,
                 flying_killer.width,
                 flying_killer.height,
             )
-            if character_rect.colliderect(fk_rect):
+            if character_rect.colliderect(flying_killer_rect):
                 hud.lose_life()
                 max_lives -= 1
                 flying_killer.remove()
@@ -240,14 +239,14 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
         )
         for flying_killer in flying_killers:
             if flying_killer.is_alive:
-                fk_rect = pygame.Rect(
+                flying_killer_rect = pygame.Rect(
                     flying_killer.position[0] - scroll_x,
                     flying_killer.position[1] - flying_killer.height,
                     flying_killer.width,
                     flying_killer.height,
                 )
-                if bullet_rect.colliderect(fk_rect):
-                    hud.add_score(100)
+                if bullet_rect.colliderect(flying_killer_rect):
+                    hud.add_score(SCORE_INCREMENT)
                     flying_killer.remove()
                     character_bullets.remove(bullet)
                     break
@@ -255,7 +254,6 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
     return max_lives
 
 def start_game(screen, clock):
-    """Run the gameplay loop until the player runs out of lives."""
     # posiciones iniciales del personaje y el suelo
     width = 100
     floor = 500
