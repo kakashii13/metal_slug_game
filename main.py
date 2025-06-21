@@ -184,7 +184,10 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
         bullet_rect = pygame.Rect(
             bullet.position[0] - scroll_x, bullet.position[1], 10, 10
         )
+        bullet_removed = False
         for soldier in soldiers:
+            if bullet_removed:
+                continue
             if soldier.is_alive:
                 soldier_rect = pygame.Rect(
                     soldier.position[0] - scroll_x,
@@ -196,7 +199,7 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
                     hud.add_score(SCORE_INCREMENT)
                     soldier.remove()
                     character_bullets.remove(bullet)
-                    break
+                    bullet_removed = True
 
     for soldier in soldiers[:]:
         if soldier.is_alive:
@@ -237,7 +240,10 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
         bullet_rect = pygame.Rect(
             bullet.position[0] - scroll_x, bullet.position[1], 10, 10
         )
+        bullet_removed = False
         for flying_killer in flying_killers:
+            if bullet_removed:
+                continue
             if flying_killer.is_alive:
                 flying_killer_rect = pygame.Rect(
                     flying_killer.position[0] - scroll_x,
@@ -249,7 +255,7 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
                     hud.add_score(SCORE_INCREMENT)
                     flying_killer.remove()
                     character_bullets.remove(bullet)
-                    break
+                    bullet_removed = True
 
     return max_lives
 
