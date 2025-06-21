@@ -82,6 +82,10 @@ class MainCharacter(Character):
             if self.frame_timer >= self.frame_rate:
                 self.current_frame = (self.current_frame + 1) % len(frames)  # cambiamos el frame cuando se cumple el frame_rate
                 self.frame_timer = 0
+            # dibujamos el frame de disparo
+            if self.current_frame >= len(frames):
+                self.current_frame = 0
+            frame = frames[self.current_frame]
             surface.blit(frame, (self.x - scroll_x, self.y - self.height)) # restamos para igualar la altura del personaje con el sprite
         elif keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
             self.frame_timer += 1
