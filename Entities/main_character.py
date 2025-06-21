@@ -20,10 +20,19 @@ class MainCharacter(Character):
         self.frame_timer = 0 # contador de frames para la animacion
         self.frame_rate = 3  # cuanto mas bajo, mas rapido se cambia el frame
         self.load_walk_sprites("Sprites/main_character", frame_count=5)  # 5 frames de caminata
-        self.shoot_frames = [] # Sprite de disparo
-        self.crounch_frame = pygame.image.load("Sprites/main_character/crouch_0.png").convert_alpha() # frame de agachado
-        self.shoot_granade_frames = [] # Sprite de disparo con granada
-        self.load_shoot_granade_sprites("Sprites/main_character/granade", frame_count=7)  # 5 frames de disparo
+        self.shoot_stand_frames = self.load_shoot_sprites(
+            "Sprites/main_character", frame_count=5
+        )  # 5 frames de disparo parado
+        self.shoot_crouch_frames = self.load_shoot_crouch_sprites(
+            "Sprites/main_character", frame_count=3
+        )  # 3 frames de disparo agachado
+        self.crounch_frame = pygame.image.load(
+            "Sprites/main_character/crouch_0.png"
+        ).convert_alpha()  # frame de agachado
+        self.shoot_granade_frames = []  # Sprite de disparo con granada
+        self.load_shoot_granade_sprites(
+            "Sprites/main_character/granade", frame_count=7
+        )
         self.is_granade = False # para que el personaje dispare granadas
         self._is_stuck = False
 
@@ -36,20 +45,24 @@ class MainCharacter(Character):
             self.walk_frames.append(frame)
 
     def load_shoot_sprites(self, folder_path, frame_count):
-        # recorro el numero de frames de la animacion de disparo
+        """Carga y devuelve los sprites de disparo de pie."""
+        frames = []
         for i in range(frame_count):
             path = f"{folder_path}/shoot_{i}.png"
             frame = pygame.image.load(path).convert_alpha()
             frame = pygame.transform.scale(frame, (60, 80))
-            self.shoot_frames.append(frame)
+            frames.append(frame)
+        return frames
 
     def load_shoot_crouch_sprites(self, folder_path, frame_count):
-        # recorro el numero de frames de la animacion de disparo agachado
+        """Carga y devuelve los sprites de disparo agachado."""
+        frames = []
         for i in range(frame_count):
             path = f"{folder_path}/shoot_crouch_{i}.png"
             frame = pygame.image.load(path).convert_alpha()
             frame = pygame.transform.scale(frame, (60, 80))
-            self.shoot_frames.append(frame)
+            frames.append(frame)
+        return frames
 
     def load_shoot_granade_sprites(self, folder_path, frame_count):
         # recorro el numero de frames de la animacion de disparo con granada
@@ -64,17 +77,16 @@ class MainCharacter(Character):
         keys = pygame.key.get_pressed()
 
         if self.is_shooting:
-            if self.is_crouching: # si el personaje esta agachado
-                self.load_shoot_crouch_sprites("Sprites/main_character", frame_count=3) # 3 frames de disparo agachado
-            else: 
-                self.load_shoot_sprites("Sprites/main_character", frame_count=5) # 5 frames de disparo parado
-            self.frame_timer += 1 
+            frames = self.shoot_crouch_frames if self.is_crouching else self.shoot_stand_frames
+            self.frame_timer += 1
             if self.frame_timer >= self.frame_rate:
-                self.current_frame = (self.current_frame + 1) % len(self.shoot_frames) # cambiamos el frame cuando se cumple el frame_rate
+                self.current_frame = (self.current_frame + 1) % len(frames)  # cambiamos el frame cuando se cumple el frame_rate
                 self.frame_timer = 0
+            # Validamos el índice por si venimos de otra animación
+            if self.current_frame >= len(frames):
+                self.current_frame = 0
             # dibujamos el frame de disparo
-            # TODO: esta linea genera un list index out of range
-            frame = self.shoot_frames[self.current_frame] 
+            frame = frames[self.current_frame]
             surface.blit(frame, (self.x - scroll_x, self.y - self.height)) # restamos para igualar la altura del personaje con el sprite
         elif keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
             self.frame_timer += 1
@@ -98,16 +110,11 @@ class MainCharacter(Character):
             frame = self.shoot_granade_frames[self.current_frame]
             surface.blit(frame, (self.x - scroll_x, self.y - self.height))
         else:
-            #personaje quieto
-             self.frame_timer += 1
-             if self.frame_timer >= self.frame_rate:
-                    self.current_frame = (self.current_frame + 1) % len(self.walk_frames) # cambiamos el frame cuando se cumple el frame_rate
-                    self.frame_timer = 0
-                # dibujamos el frame de caminata
-             if self.current_frame >= len(self.walk_frames):
-                    self.current_frame = 0
-             frame = self.walk_frames[self.current_frame]
-             surface.blit(frame, (self.x - scroll_x, self.y - self.height)) # dibujamos el personaje en la pantalla
+            # personaje quieto: mostramos el primer frame sin animar
+            self.current_frame = 0
+            self.frame_timer = 0
+            frame = self.walk_frames[0]
+            surface.blit(frame, (self.x - scroll_x, self.y - self.height))  # dibujamos el personaje en la pantalla
         #  # Fuente para dibujar texto
         # font = pygame.font.SysFont(None, 24)
         
