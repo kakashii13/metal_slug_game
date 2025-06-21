@@ -173,7 +173,7 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
     for obstacle in obstacles[:]:
         obstacle_rect = pygame.Rect(
             obstacle.position[0] - scroll_x,
-            obstacle.position[1],
+            obstacle.position[1] - obstacle.size[1],
             obstacle.size[0],
             obstacle.size[1],
         )
