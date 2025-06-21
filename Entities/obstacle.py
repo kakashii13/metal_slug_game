@@ -12,10 +12,11 @@ class Obstacle:
         ).convert_alpha()
     
     def draw(self, surface, scroll_x=0):
+        ajusted_height = 30 # ajustamos la altura del obstaculo para que coincida con el piso
         frame = pygame.transform.scale(self.obstacle_frame, (self.width, self.height))
         surface.blit(
             frame,
-            (self.x - scroll_x, self.y - self.height),
+            (self.x - scroll_x, self.y - self.height + ajusted_height),
         )  # restamos para igualar la altura del obstaculo con el sprite
 
     def move(self):
