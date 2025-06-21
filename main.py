@@ -10,6 +10,8 @@ from entities.obstacle import Obstacle
 from entities.rescued_character import RescuedCharacter
 from hud import Hud
 
+#TODO agregar sonido
+
 # tamaño de la ventana 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600

@@ -1,6 +1,9 @@
 import pygame
 from entities.character import Character
 
+#TODO refactor
+#TODO agregar animacion de disparo
+
 class MainCharacter(Character):
     def __init__(self, x = 0, y = 0):
         super().__init__(x, y)
@@ -96,7 +99,6 @@ class MainCharacter(Character):
             frame = self.walk_frames[0]
             surface.blit(frame, (self.x - scroll_x, self.y - self.height))  # dibujamos el personaje en la pantalla
 
-    # TODO: por que "camina" el personaje cuando no lo estoy moviendo?
     def move(self, keys):
         scroll_amount = 0
         if not keys[pygame.K_DOWN]:
