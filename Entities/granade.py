@@ -1,0 +1,2 @@
+class Granade:
+    pass

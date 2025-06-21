@@ -5,18 +5,18 @@ class GameOverScreen:
     def __init__(self, screen):
         self.screen = screen
         self.font = pygame.font.SysFont(None, 36)
-        self.title_color = (0, 0, 0)
+        self.title_color = (255,255,255)
+        raw_image = pygame.image.load("Sprites/background/game_over.jpg").convert()
+        self.frame = pygame.transform.scale(raw_image, (800, 600))
 
     def draw(self):
         waiting = True
         while waiting:
-            self.screen.fill((255, 255, 255))
+            self.screen.blit(self.frame, (0, 0))
 
-            title = self.font.render("¡Perdiste!", True, self.title_color)
-            instruction = self.font.render("Presiona R para reiniciar", True, self.title_color)
+            instruction = self.font.render("R para reiniciar", True, self.title_color)
 
-            self.screen.blit(title, (320, 200))
-            self.screen.blit(instruction, (220, 300))
+            self.screen.blit(instruction, (220, 50))
 
             pygame.display.update()
 

@@ -1,23 +1,16 @@
 import pygame
 
 class Bullet:
-    def __init__(self, x, y, direction):
+    def __init__(self, x, y, direction, sprite_path="Sprites/Bullet/bullet.png", speed = 15):
         self.x = x
         self.y = y
         self.direction = direction
-        self.speed = 15
+        self.speed = speed
+        self.sprite_path = sprite_path
 
     def draw(self, screen):
-        bullet_sprite = pygame.image.load("Sprites/Bullet/bullet.png").convert_alpha()
+        bullet_sprite = pygame.image.load(self.sprite_path).convert_alpha()
         screen.blit(bullet_sprite, (self.x, self.y))
-         # Fuente para dibujar texto
-        font = pygame.font.SysFont(None, 24)
-        
-        # Crear texto con la posición
-        coord_text = font.render(f"({self.x}, {self.y})", True, (0, 0, 0))  # negro
-        
-        # Dibujar texto sobre el personaje
-        screen.blit(coord_text, (self.x + 50, self.y - 20))  # un poco más arriba
        
     def move(self):
         self.x += self.speed * self.direction

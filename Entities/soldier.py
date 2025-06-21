@@ -17,9 +17,10 @@ class Soldier(Character):
         for i in range(frame_count):
             path = f"{folder_path}/chinese_soldier_{i}.png"
             frame = pygame.image.load(path).convert_alpha()
+            frame = pygame.transform.scale(frame, (60, 80))
             self.walk_frames.append(frame)
 
-    def draw(self, surface):
+    def draw(self, surface, scroll_x = 0):
         if self.is_alive:
             # Actualiza la animacion si se esta moviendo
             self.frame_timer += 1 
@@ -27,16 +28,7 @@ class Soldier(Character):
                 self.current_frame = (self.current_frame + 1) % len(self.walk_frames)
                 self.frame_timer = 0
             # dibujamos el frame de caminata
-            surface.blit(self.walk_frames[self.current_frame], (self.x, self.y - self.height))
-        # Fuente para dibujar texto
-        font = pygame.font.SysFont(None, 24)
-        
-        # Crear texto con la posición
-        coord_text = font.render(f"({self.x}, {self.y}, {self.height})", True, (0, 0, 0))  # negro
-        
-        # Dibujar texto sobre el personaje
-        surface.blit(coord_text, (self.x + 50, self.y - 20))  # un poco más arriba
-            
+            surface.blit(self.walk_frames[self.current_frame], (self.x - scroll_x, self.y - self.height))
 
     def move(self):
         if self.is_alive:
@@ -53,3 +45,11 @@ class Soldier(Character):
     @is_alive.setter
     def is_alive(self, value):
         self._is_alive = value
+
+    @property
+    def speed(self):
+        return self._speed
+    
+    @speed.setter
+    def speed(self, value):
+        self._speed = value
