@@ -19,7 +19,7 @@ WINDOW_HEIGHT = 600
 # game constants
 DIFFICULTY_INTERVAL = 10000
 INITIAL_SOLDIER_SPEED = 10
-CHINESE_SOLDIER_SPAWN_INTERVAL = 1200
+CHINESE_SOLDIER_SPAWN_INTERVAL = 1500
 FLYING_KILLER_SPAWN_INTERVAL = 6000
 FLYING_KILLER_INITIAL_DELAY = 1000
 OBSTACLE_SPAWN_INTERVAL = 10000
@@ -157,7 +157,7 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
         character.size[1],
     )
 
-    # Adjuta la posicion del personaje rescatado para que coincida con el personaje principal
+    # ajusta la posicion del personaje rescatado para que coincida con el personaje principal
     adjusted_position = 15
 
     for rescued_character in rescued_characters[:]:
@@ -206,7 +206,7 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
     for soldier in soldiers[:]:
         if soldier.is_alive:
             soldier_rect = pygame.Rect(
-                soldier.position[0],
+                soldier.position[0] - scroll_x,
                 soldier.position[1],
                 soldier.size[0],
                 soldier.size[1],

@@ -1,103 +1,80 @@
 import pygame
 from entities.character import Character
 
-#TODO refactor
-#TODO agregar animacion de disparo
-
 class MainCharacter(Character):
-    def __init__(self, x = 0, y = 0):
+    def __init__(self, x=0, y=0):
         super().__init__(x, y)
+
+        # estado inicial
         self.color = (0, 0, 255)
-        self.initial_y = y # representa el suelo
-        self.initial_x = x 
+        self.initial_x = x
+        self.initial_y = y
         self.is_jumping = False
-        self.is_crouching = False # para que el personaje se agache
-        self.jump_height = -25 # altura del salto
-        self.gravity = 2.8 # gravedad para que el personaje caiga lento
-        self.velocity_y = 0 # velocidad del salto
+        self.is_crouching = False
         self.is_shooting = False
-        self._hit_box_height = self.height
-        # Sprite de caminata
-        self.walk_frames = []
-        self.current_frame = 0 # frame actual de la animacion
-        self.frame_timer = 0 # contador de frames para la animacion
-        self.frame_rate = 3  # cuanto mas bajo, mas rapido se cambia el frame
-        self.load_walk_sprites("Sprites/main_character", frame_count=5)  # 5 frames de caminata
-        self.shoot_stand_frames = self.load_shoot_sprites(
-            "Sprites/main_character", frame_count=5
-        )  # 5 frames de disparo parado
-        self.shoot_crouch_frames = self.load_shoot_crouch_sprites(
-            "Sprites/main_character", frame_count=3
-        )  # 3 frames de disparo agachado
-        self.crounch_frame = pygame.image.load(
-            "Sprites/main_character/crouch_0.png"
-        ).convert_alpha()  # frame de agachado
         self._is_stuck = False
 
-    def load_walk_sprites(self, folder_path, frame_count):
-        # recorro el numero de frames de la animacion de caminata
-        for i in range(frame_count):
-            path = f"{folder_path}/walk_{i}.png"
-            frame = pygame.image.load(path).convert_alpha()
-            frame = pygame.transform.scale(frame, (60, 80))
-            self.walk_frames.append(frame)
+        # fisicas
+        self.jump_height = -25
+        self.gravity = 2.8
+        self.velocity_y = 0
+        self._hit_box_height = self.height
 
-    def load_shoot_sprites(self, folder_path, frame_count):
-        """Carga y devuelve los sprites de disparo de pie."""
+        # animacion
+        self.current_frame = 0
+        self.frame_timer = 0
+        self.frame_rate = 3
+
+        # cargar los sprites
+        self._load_sprites()
+
+    def _load_sprites(self):
+        folder = "Sprites/main_character"
+        self.walk_frames = self._load_sprite_sequence(folder, "walk", 5)
+        self.shoot_stand_frames = self._load_sprite_sequence(folder, "shoot", 5)
+        self.shoot_crouch_frames = self._load_sprite_sequence(folder, "shoot_crouch", 3)
+        self.crouch_frame = pygame.image.load(f"{folder}/crouch_0.png").convert_alpha()
+
+    # cargamos la secuencia de sprites desde la carpeta de sprites
+    def _load_sprite_sequence(self, folder_path, prefix, frame_count, size=(60, 80)):
         frames = []
         for i in range(frame_count):
-            path = f"{folder_path}/shoot_{i}.png"
+            path = f"{folder_path}/{prefix}_{i}.png"
             frame = pygame.image.load(path).convert_alpha()
-            frame = pygame.transform.scale(frame, (60, 80))
-            frames.append(frame)
-        return frames
-
-    def load_shoot_crouch_sprites(self, folder_path, frame_count):
-        """Carga y devuelve los sprites de disparo agachado."""
-        frames = []
-        for i in range(frame_count):
-            path = f"{folder_path}/shoot_crouch_{i}.png"
-            frame = pygame.image.load(path).convert_alpha()
-            frame = pygame.transform.scale(frame, (60, 80))
+            frame = pygame.transform.scale(frame, size)
             frames.append(frame)
         return frames
 
     def draw(self, surface, scroll_x=0):
-        # Actualiza la animación si se está moviendo
         keys = pygame.key.get_pressed()
+        frame = None  # frame final a dibujar
 
         if self.is_shooting:
             frames = self.shoot_crouch_frames if self.is_crouching else self.shoot_stand_frames
+        elif keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
+            frames = self.walk_frames
+        else:
+            frames = None
+
+        if frames:
             self.frame_timer += 1
             if self.frame_timer >= self.frame_rate:
-                self.current_frame = (self.current_frame + 1) % len(frames)  # cambiamos el frame cuando se cumple el frame_rate
+                self.current_frame = (self.current_frame + 1) % len(frames)
                 self.frame_timer = 0
-            # dibujamos el frame de disparo
             if self.current_frame >= len(frames):
                 self.current_frame = 0
             frame = frames[self.current_frame]
-            surface.blit(frame, (self.x - scroll_x, self.y - self.height)) # restamos para igualar la altura del personaje con el sprite
-        elif keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
-            self.frame_timer += 1
-            if self.frame_timer >= self.frame_rate:
-                self.current_frame = (self.current_frame + 1) % len(self.walk_frames) # cambiamos el frame cuando se cumple el frame_rate
-                self.frame_timer = 0
-            # dibujamos el frame de caminata
-            if self.current_frame >= len(self.walk_frames):
-                self.current_frame = 0
-            frame = self.walk_frames[self.current_frame]
-            surface.blit(frame, (self.x - scroll_x, self.y - self.height))
+
         elif self.is_crouching:
-            # dibujamos el frame de agachado
-            frame = pygame.transform.scale(self.crounch_frame, (70, 80)) # escalamos el frame de agachado
-            surface.blit(frame, (self.x - scroll_x, self.y - self.height)) # restamos para igualar la altura del personaje con el sprite
-            # personaje disparando una granada
+            frame = pygame.transform.scale(self.crouch_frame, (70, 80))
         else:
-            # personaje quieto: mostramos el primer frame sin animar
             self.current_frame = 0
             self.frame_timer = 0
             frame = self.walk_frames[0]
-            surface.blit(frame, (self.x - scroll_x, self.y - self.height))  # dibujamos el personaje en la pantalla
+
+        # Dibujar el frame final
+        if frame:
+            surface.blit(frame, (self.x - scroll_x, self.y - self.height))
 
     def move(self, keys):
         scroll_amount = 0
