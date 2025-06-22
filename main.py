@@ -206,8 +206,8 @@ def check_collisions(character, character_bullets, soldiers, flying_killers,
     for soldier in soldiers[:]:
         if soldier.is_alive:
             soldier_rect = pygame.Rect(
-                soldier.position[0] - scroll_x,
-                soldier.position[1],
+                soldier.position[0],
+                soldier.position[1] - soldier.size[1],
                 soldier.size[0],
                 soldier.size[1],
             )
