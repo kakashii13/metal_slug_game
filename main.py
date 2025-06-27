@@ -10,8 +10,6 @@ from entities.obstacle import Obstacle
 from entities.rescued_character import RescuedCharacter
 from hud import Hud
 
-#TODO agregar sonido
-
 # tamaño de la ventana 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
@@ -111,6 +109,7 @@ def update_bullets(character, keys, current_time, character_bullets,
                         character.get_shoot_position[1], 1)
         character_bullets.append(bullet)
         character.is_shooting = True
+        bullet.play_shoot_sound()
     else:
         character.is_shooting = False
 
@@ -271,6 +270,10 @@ def start_game(screen, clock):
      # imagen de fondo
     background = pygame.image.load("Sprites/background/map.png").convert()
     
+    # sonido del juego
+    pygame.mixer.music.load("resources/sounds/game.mp3")
+    pygame.mixer.music.set_volume(0.1) 
+    pygame.mixer.music.play(-1) 
 
     # personaje principal
     character = MainCharacter(width, floor)
@@ -387,6 +390,9 @@ def start_game(screen, clock):
 
         pygame.display.update()
         clock.tick(20)
+
+    # Termina el juego y pauso la musica
+    pygame.mixer.music.stop()  
 
 
 

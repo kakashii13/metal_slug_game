@@ -12,6 +12,10 @@ class Soldier(Character):
         self.frame_rate = 5
         self.load_walk_sprites("Sprites/chinese_soldier", frame_count=6)  # 6 frames de caminata
 
+        # sonido de muerto
+        self.death_sound = pygame.mixer.Sound("resources/sounds/soldier_death.wav")
+        self.death_sound.set_volume(0.08) 
+
     def load_walk_sprites(self, folder_path, frame_count):
         # recorro el numero de frames de la animacion de caminata
         for i in range(frame_count):
@@ -37,7 +41,8 @@ class Soldier(Character):
     def remove(self):
         self.x = -100
         self.is_alive = False
-    
+        self.death_sound.play()  
+
     @property
     def is_alive(self):
         return self._is_alive

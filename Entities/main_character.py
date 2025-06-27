@@ -133,6 +133,7 @@ class MainCharacter(Character):
 
     def stop_shooting(self):
         self.is_shooting = False
+
     
     @property
     def is_stuck(self):
